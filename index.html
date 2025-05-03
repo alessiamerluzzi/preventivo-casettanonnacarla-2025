@@ -257,11 +257,11 @@
  
       
 
-        <!-- Modifica sezione contatti -->
+      <!-- Modifica sezione contatti -->
 <h2>Contatti</h2>
 <div class="contact-section">
     <div class="info-warning">
-        <p><strong>Attenzione!</strong> Compilare il form <strong>non corrisponde ad aver ultimato la prenotazione</strong>. Una volta inviata la richiesta di prenotazione, otterrai una risposta con il <a href="https://drive.google.com/file/d/1F3s1EmPZ9z5bojuc5EUSRZLn0rb4Qyhp/view">contratto di locazione transitoria a fini turistici</a> da firmare. Solo a quel punto la prenotazione potrà dirsi ultimata.</p>
+        <p><strong>Attenzione!</strong> Compilare il form <strong>non corrisponde ad aver ultimato la prenotazione</strong>. Una volta inviata la richiesta di prenotazione, otterrai una risposta con il <a href="https://drive.google.com/file/d/1F3s1EmPZ9z5bojuc5EUSRZLn0rb4Qyhp/view?usp=sharing" target="_blank">contratto di locazione transitoria a fini turistici</a> da firmare. Solo a quel punto la prenotazione potrà dirsi ultimata.</p>
     </div>
     
     <form id="contact-form" class="contact-form">
@@ -279,13 +279,16 @@
         <div class="form-row">
             <label for="pets">Animali domestici:</label>
             <input type="number" id="pets" name="pets" min="0" max="2" value="0">
-            <div class="form-hint">Massimo 2 animali. Per il secondo animale è richiesta una tariffa aggiuntiva di 2€ al giorno. <b>La tariffa non è calcolata nel prezzo del preventivo.</b></div>
+            <div class="form-hint">Massimo 2 animali.  Per il secondo animale è richiesta una tariffa aggiuntiva di 2€ al giorno. <b>La tariffa non è calcolata nel prezzo del preventivo.</b></div>
         </div>
         
-        <div class="form-row">
+        <div class="form-row period-selection">
             <label for="period">Periodo del soggiorno: <span class="required">*</span></label>
-            <input type="text" id="period" name="period" required>
-            <div class="form-hint">Inserisci le date di check-in e check-out</div>
+            <div class="period-input-container">
+                <input type="text" id="period" name="period" readonly required>
+                <button type="button" id="open-calendar-btn" class="calendar-btn">Seleziona date</button>
+            </div>
+            <div class="form-hint calendar-hint">Le date possono essere selezionate <strong> solamente tramite il calendario principale</strong>. Se una data non è selezionabile, significa che è già stata prenotata.</div>
         </div>
         
         <div class="form-row">
@@ -294,11 +297,11 @@
         </div>
         
         <div class="form-row">
-            <div class="form-hint warning">Si consiglia di calcolare prima il preventivo cliccando sul pulsante "Calcola Preventivo" sopra, in modo che le informazioni sul prezzo vengano incluse nella tua richiesta.</div>
+            <div class="form-hint warning">Non è possibile inviare la richiesta senza aver selezionato le date nel calendario principale. Se una data non è selezionabile attraverso il calendario principale significa che <strong> è già stata prenotata </strong> e, dunque, <strong> è impossibile prenotarla di nuovo</strong>.</div>
         </div>
         
         <div class="form-row">
-            <button type="submit" id="submit-form" class="submit-btn">Invia Richiesta</button>
+            <button type="submit" id="submit-form" class="submit-btn disabled-btn" disabled>Invia Richiesta</button>
         </div>
     </form>
     
@@ -347,6 +350,39 @@
         border-radius: 4px;
     }
     
+    /* Stile per il campo periodo in sola lettura */
+    .form-row input#period {
+        background-color: #f9f9f9;
+        cursor: not-allowed;
+    }
+    
+    /* Stile per il contenitore del periodo */
+    .period-input-container {
+        display: flex;
+        gap: 10px;
+    }
+    
+    /* Stile per il pulsante del calendario */
+    .calendar-btn {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+    
+    .calendar-btn:hover {
+        background-color: #2980b9;
+    }
+    
+    .calendar-hint {
+        color: #e74c3c;
+        font-weight: 500;
+    }
+    
     .form-hint {
         font-size: 0.8em;
         color: #666;
@@ -372,6 +408,17 @@
     
     .submit-btn:hover {
         background-color: #2980b9;
+    }
+    
+    /* Stile per il pulsante disabilitato */
+    .submit-btn.disabled-btn {
+        background-color: #ccc;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+    
+    .submit-btn.disabled-btn:hover {
+        background-color: #ccc;
     }
     
     .form-hint.warning {
@@ -402,31 +449,106 @@
     }
 </style>
 
-<!-- JavaScript per l'invio del form -->
+<!-- JavaScript per l'invio del form e gestione del calendario -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Seleziona il form di contatto
+        // Seleziona il form di contatto e altri elementi
         const contactForm = document.getElementById('contact-form');
         const formResult = document.getElementById('form-result');
+        const periodInput = document.getElementById('period');
+        const openCalendarBtn = document.getElementById('open-calendar-btn');
+        const submitBtn = document.getElementById('submit-form');
+        
+        // Riferimento al calendario (potrebbe essere necessario adattarlo in base alla struttura del sito)
+        const calendarSection = document.querySelector('.booking-section') || document.getElementById('calendar-section');
+        
+        // Funzione per verificare se è possibile inviare il form
+        function checkFormValidity() {
+            const fullName = document.getElementById('full-name').value.trim();
+            const guests = document.getElementById('guests').value;
+            const period = periodInput.value.trim();
+            
+            // Controlla se i campi obbligatori sono compilati
+            const isValid = fullName !== '' && guests !== '' && period !== '';
+            
+            // Abilita o disabilita il pulsante di invio
+            submitBtn.disabled = !isValid;
+            
+            // Aggiungi o rimuovi classe visuale per il pulsante disabilitato
+            if (isValid) {
+                submitBtn.classList.remove('disabled-btn');
+            } else {
+                submitBtn.classList.add('disabled-btn');
+            }
+            
+            return isValid;
+        }
+        
+        // Esegui il controllo iniziale della validità
+        checkFormValidity();
+        
+        // Aggiungi event listener per tutti i campi obbligatori per verificare la validità
+        document.getElementById('full-name').addEventListener('input', checkFormValidity);
+        document.getElementById('guests').addEventListener('input', checkFormValidity);
+        periodInput.addEventListener('change', checkFormValidity);
+        
+        // Impedisci qualsiasi tentativo di modifica del campo periodo
+        periodInput.addEventListener('focus', function(e) {
+            // Mostra un messaggio o sposta il focus al pulsante del calendario
+            openCalendarBtn.focus();
+            
+            // Se il campo periodo è vuoto, mostra un messaggio e scorre al calendario
+            if (!periodInput.value.trim()) {
+                alert('Per favore, seleziona le date del soggiorno utilizzando il calendario principale.');
+                if (calendarSection) {
+                    calendarSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+        
+        // Implementa il pulsante per aprire il calendario
+        openCalendarBtn.addEventListener('click', function() {
+            // Scorrere alla sezione del calendario
+            if (calendarSection) {
+                calendarSection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                // Se non riesci a trovare il calendario, mostra un messaggio
+                alert('Per favore, utilizza il calendario principale nella parte superiore della pagina per selezionare le date del soggiorno.');
+            }
+        });
+        
+        // Prevenire l'inserimento manuale con un avviso
+        periodInput.addEventListener('keydown', function(e) {
+            e.preventDefault();
+            alert('Per favore, utilizza il calendario principale per selezionare le date del soggiorno.');
+        });
         
         // Aggiungi l'evento di submit al form
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Verifica nuovamente la validità prima di procedere
+            if (!checkFormValidity()) {
+                formResult.innerHTML = 'Per favore, compila tutti i campi obbligatori.';
+                formResult.className = 'form-result error-message';
+                formResult.style.display = 'block';
+                
+                // Evidenzia specificamente se il periodo non è selezionato
+                if (!periodInput.value.trim()) {
+                    alert('È necessario selezionare un periodo di soggiorno utilizzando il calendario principale.');
+                    if (calendarSection) {
+                        calendarSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+                return;
+            }
+            
             // Raccogli i dati dal form
             const fullName = document.getElementById('full-name').value;
             const guests = document.getElementById('guests').value;
             const pets = document.getElementById('pets').value;
-            const period = document.getElementById('period').value;
+            const period = periodInput.value;
             const other = document.getElementById('other').value;
-            
-            // Validazione
-            if (!fullName || !guests || !period) {
-                formResult.innerHTML = 'Per favore, compila tutti i campi obbligatori.';
-                formResult.className = 'form-result error-message';
-                formResult.style.display = 'block';
-                return;
-            }
             
             // Ottieni il contenuto del preventivo calcolato, se disponibile
             let preventivo = "Nessun preventivo calcolato";
@@ -452,9 +574,6 @@
             formResult.innerHTML = 'Grazie per la tua richiesta! Si aprirà il tuo client email per completare l\'invio.';
             formResult.className = 'form-result success-message';
             formResult.style.display = 'block';
-            
-            // Reimposta il form (opzionale)
-            // contactForm.reset();
         });
         
         // Aggiungi validazione per i campi numerici
@@ -462,6 +581,7 @@
         guestsInput.addEventListener('change', function() {
             if (this.value < 1) this.value = 1;
             if (this.value > 4) this.value = 4;
+            checkFormValidity();
         });
         
         const petsInput = document.getElementById('pets');
@@ -470,23 +590,40 @@
             if (this.value > 2) this.value = 2;
         });
         
-        // Aggiungi l'auto-compilazione del periodo dal calendario se disponibile
+        // Migliora la sincronizzazione con il calendario principale
         const selectedDatesElement = document.getElementById('selected-dates');
-        const periodInput = document.getElementById('period');
         
-        if (selectedDatesElement && periodInput) {
+        if (selectedDatesElement) {
+            // Imposta immediatamente il valore se esiste già
+            if (selectedDatesElement.textContent && selectedDatesElement.textContent !== 'Nessuna data selezionata') {
+                periodInput.value = selectedDatesElement.textContent;
+                checkFormValidity(); // Controlla la validità dopo l'impostazione
+            }
+            
             // Osserva il contenuto dell'elemento delle date selezionate
             const observer = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     // Se il contenuto non è "Nessuna data selezionata", copialo nel campo del periodo
-                    if (selectedDatesElement.textContent !== 'Nessuna data selezionata') {
-                        periodInput.value = selectedDatesElement.textContent;
+                    const newContent = selectedDatesElement.textContent;
+                    if (newContent && newContent !== 'Nessuna data selezionata') {
+                        periodInput.value = newContent;
+                    } else {
+                        periodInput.value = '';
                     }
+                    
+                    // Controlla la validità del form dopo ogni modifica
+                    checkFormValidity();
                 });
             });
             
-            // Configura l'osservatore
-            observer.observe(selectedDatesElement, { childList: true, characterData: true, subtree: true });
+            // Configura l'osservatore per monitorare tutti i possibili cambiamenti
+            observer.observe(selectedDatesElement, { 
+                childList: true, 
+                characterData: true, 
+                subtree: true,
+                attributes: true,
+                attributeOldValue: true 
+            });
         }
     });
 </script>
