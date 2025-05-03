@@ -230,7 +230,8 @@
         <h2>Biancheria</h2>
         <div class="info-box">
             La biancheria del letto e del bagno non è inclusa nel preventivo calcolato: può essere noleggiata o portata da casa. 
-            Ogni kit include: 1 asciugamano grande e 2 piccoli, lenzuolo sotto, lenzuolo sopra e federe.
+            Ogni kit include: 1 asciugamano grande e 2 piccoli, lenzuolo sotto, lenzuolo sopra e federe.  <p> <small>Per decidere di quali kit hai bisogno, visita <a href="https://sites.google.com/view/casettanonnacarla/galleria?authuser=0">il nostro sito e scopri come sono ripartiti i posti letto.</a></small>
+</p>
         </div>
         
         <div class="options-section">
@@ -257,7 +258,7 @@
  
       
 
-      <!-- Modifica sezione contatti -->
+     <!-- Modifica sezione contatti -->
 <h2>Contatti</h2>
 <div class="contact-section">
     <div class="info-warning">
@@ -550,22 +551,58 @@
             const period = periodInput.value;
             const other = document.getElementById('other').value;
             
-            // Ottieni il contenuto del preventivo calcolato, se disponibile
-            let preventivo = "Nessun preventivo calcolato";
+            // Ottieni il contenuto dettagliato del preventivo
+            let preventivoDettagliato = "Nessun preventivo calcolato";
             const resultElement = document.getElementById('result');
+            
             if (resultElement && resultElement.style.display !== 'none') {
-                // Estrai il prezzo totale dal preventivo
-                const priceTotal = resultElement.querySelector('.price-total');
-                if (priceTotal) {
-                    preventivo = "Preventivo: " + priceTotal.textContent.trim();
+                // Inizia a costruire il preventivo dettagliato
+                let dettagliPreventivo = [];
+                
+                // Verifica se c'è un elemento di successo (che contiene il preventivo)
+                const successElement = resultElement.querySelector('.success');
+                if (successElement) {
+                    // Estrai il periodo e il numero di notti
+                    const periodoText = successElement.querySelector('p')?.textContent || '';
+                    if (periodoText) {
+                        dettagliPreventivo.push(periodoText);
+                    }
+                    
+                    // 1. Estrai le singole notti dalla classe price-item (escludendo il totale e altri elementi speciali)
+                    const priceItems = resultElement.querySelectorAll('.price-item:not(.price-total)');
+                    if (priceItems && priceItems.length > 0) {
+                        priceItems.forEach(item => {
+                            const itemText = item.textContent.trim().replace(/\s+/g, ' ');
+                            
+                            // Verifica se è un elemento di notte, spese pulizia o kit biancheria
+                            if (itemText.includes('Notte') || 
+                                itemText.includes('Spese di pulizia') || 
+                                itemText.includes('Kit Biancheria')) {
+                                dettagliPreventivo.push(itemText);
+                            }
+                        });
+                    }
+                    
+                    // Estrai il prezzo totale
+                    const priceTotalElement = resultElement.querySelector('.price-total');
+                    if (priceTotalElement) {
+                        dettagliPreventivo.push(priceTotalElement.textContent.trim().replace(/\s+/g, ' '));
+                    }
+                }
+                
+                // Se abbiamo trovato dettagli, li usiamo; altrimenti facciamo fallback sul testo completo
+                if (dettagliPreventivo.length > 0) {
+                    preventivoDettagliato = dettagliPreventivo.join("%0D%0A");
                 } else {
-                    // Se non trova il prezzo totale, prende tutto il contenuto
-                    preventivo = "Preventivo: " + resultElement.textContent.trim().replace(/\s+/g, ' ');
+                    // Fallback: prendi tutto il contenuto testuale del preventivo
+                    preventivoDettagliato = "Preventivo:%0D%0A" + resultElement.textContent.trim()
+                        .replace(/\s+/g, ' ')
+                        .split('.').join("%0D%0A");
                 }
             }
             
-            // Prepara i dati per l'email con il preventivo incluso
-            const mailtoLink = `mailto:merluzzialessia@gmail.com?subject=Richiesta Prenotazione Casa Vacanze&body=Nome e Cognome: ${encodeURIComponent(fullName)}%0D%0ANumero di ospiti: ${encodeURIComponent(guests)}%0D%0AAnimali domestici: ${encodeURIComponent(pets)}%0D%0APeriodo del soggiorno: ${encodeURIComponent(period)}%0D%0A${encodeURIComponent(preventivo)}%0D%0AAltro: ${encodeURIComponent(other)}`;
+            // Prepara i dati per l'email con il preventivo dettagliato
+            const mailtoLink = `mailto:merluzzialessia@gmail.com?subject=Richiesta Prenotazione Casa Vacanze&body=Nome e Cognome: ${encodeURIComponent(fullName)}%0D%0ANumero di ospiti: ${encodeURIComponent(guests)}%0D%0AAnimali domestici: ${encodeURIComponent(pets)}%0D%0APeriodo del soggiorno: ${encodeURIComponent(period)}%0D%0A%0D%0APREVENTIVO DETTAGLIATO:%0D%0A${preventivoDettagliato}%0D%0A%0D%0AAltro: ${encodeURIComponent(other)}`;
             
             // Apri il client di posta predefinito
             window.location.href = mailtoLink;
