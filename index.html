@@ -258,7 +258,7 @@
  
       
 
-     <!-- Modifica sezione contatti -->
+<!-- Modifica sezione contatti -->
 <h2>Contatti</h2>
 <div class="contact-section">
      <div class="form-hint warning">
@@ -463,64 +463,6 @@
         // Riferimento al calendario (potrebbe essere necessario adattarlo in base alla struttura del sito)
         const calendarSection = document.querySelector('.booking-section') || document.getElementById('calendar-section');
         
-        // Funzione per calcolare il numero di notti tra due date
-        function calculateNights(periodString) {
-            if (!periodString || periodString.trim() === '' || !periodString.includes(' - ')) {
-                return 0;
-            }
-            
-            // Format expected: "3 Maggio 2025 - 7 Maggio 2025"
-            const dates = periodString.split(' - ');
-            if (dates.length !== 2) {
-                return 0;
-            }
-            
-            // Parse delle date in formato italiano
-            const parseItalianDate = (dateStr) => {
-                const months = {
-                    'gennaio': 0, 'febbraio': 1, 'marzo': 2, 'aprile': 3, 
-                    'maggio': 4, 'giugno': 5, 'luglio': 6, 'agosto': 7, 
-                    'settembre': 8, 'ottobre': 9, 'novembre': 10, 'dicembre': 11,
-                    // Versioni abbreviate o con prima lettera maiuscola
-                    'gen': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'mag': 4, 'giu': 5,
-                    'lug': 6, 'ago': 7, 'set': 8, 'ott': 9, 'nov': 10, 'dic': 11,
-                    'Gennaio': 0, 'Febbraio': 1, 'Marzo': 2, 'Aprile': 3, 
-                    'Maggio': 4, 'Giugno': 5, 'Luglio': 6, 'Agosto': 7, 
-                    'Settembre': 8, 'Ottobre': 9, 'Novembre': 10, 'Dicembre': 11
-                };
-                
-                const parts = dateStr.trim().split(' ');
-                if (parts.length < 3) {
-                    return null;
-                }
-                
-                const day = parseInt(parts[0], 10);
-                const monthName = parts[1].toLowerCase();
-                const year = parseInt(parts[2], 10);
-                
-                const month = months[monthName];
-                if (month === undefined) {
-                    return null;
-                }
-                
-                return new Date(year, month, day);
-            };
-            
-            const startDate = parseItalianDate(dates[0]);
-            const endDate = parseItalianDate(dates[1]);
-            
-            if (!startDate || !endDate) {
-                return 0;
-            }
-            
-            // Calcola la differenza in giorni
-            const diffTime = endDate - startDate;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            // Il giorno di checkout non conta come notte
-            return diffDays;
-        }
-        
         // Funzione per verificare se è possibile inviare il form
         function checkFormValidity() {
             const fullName = document.getElementById('full-name').value.trim();
@@ -602,18 +544,6 @@
                 return;
             }
             
-            // Verifica il numero minimo di notti (4)
-            const numberOfNights = calculateNights(periodInput.value);
-            if (numberOfNights < 4) {
-                formResult.innerHTML = '<strong>Non si accettano prenotazioni inferiori a 4 notti.</strong> Il soggiorno selezionato è di ' + numberOfNights + ' notti.';
-                formResult.className = 'form-result error-message';
-                formResult.style.display = 'block';
-                
-                // Scorrere al messaggio di errore
-                formResult.scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-            
             // Raccogli i dati dal form
             const fullName = document.getElementById('full-name').value;
             const guests = document.getElementById('guests').value;
@@ -672,7 +602,7 @@
             }
             
             // Prepara i dati per l'email con il preventivo dettagliato
-            const mailtoLink = `mailto:merluzzialessia@gmail.com?subject=Richiesta Prenotazione Casa Vacanze&body=Nome e Cognome: ${encodeURIComponent(fullName)}%0D%0ANumero di ospiti: ${encodeURIComponent(guests)}%0D%0AAnimali domestici: ${encodeURIComponent(pets)}%0D%0APeriodo del soggiorno: ${encodeURIComponent(period)} (${numberOfNights} notti)%0D%0A%0D%0APREVENTIVO DETTAGLIATO:%0D%0A${preventivoDettagliato}%0D%0A%0D%0AAltro: ${encodeURIComponent(other)}`;
+            const mailtoLink = `mailto:merluzzialessia@gmail.com?subject=Richiesta Prenotazione Casa Vacanze&body=Nome e Cognome: ${encodeURIComponent(fullName)}%0D%0ANumero di ospiti: ${encodeURIComponent(guests)}%0D%0AAnimali domestici: ${encodeURIComponent(pets)}%0D%0APeriodo del soggiorno: ${encodeURIComponent(period)}%0D%0A%0D%0APREVENTIVO DETTAGLIATO:%0D%0A${preventivoDettagliato}%0D%0A%0D%0AAltro: ${encodeURIComponent(other)}`;
             
             // Apri il client di posta predefinito
             window.location.href = mailtoLink;
@@ -734,6 +664,7 @@
         }
     });
 </script>
+        
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Definizione delle tariffe
