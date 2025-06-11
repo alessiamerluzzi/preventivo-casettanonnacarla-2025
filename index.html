@@ -869,10 +869,24 @@
                         selectedDates = [];
                         // Aggiungi la nuova data
                         selectedDates.push(date);
-                    } else {
-                        // Aggiungi la data
-                        selectedDates.push(date);
-                    }
+                        
+                           } else {
+            // Selezione della seconda data: assicurati che sia almeno 4 giorni dopo la prima
+            if (selectedDates.length === 1) {
+                const checkinDate = selectedDates[0];
+                const millisecondsInDay = 24 * 60 * 60 * 1000;
+                const minCheckoutDate = new Date(checkinDate.getTime() + 4 * millisecondsInDay);
+
+                if (date < minCheckoutDate) {
+                    alert('La data di check-out deve essere almeno 4 notti dopo il check-in.');
+                    return;
+                }
+            }
+
+            // Aggiungi la data
+            selectedDates.push(date);
+        }
+
                 } else {
                     // Rimuovi la data
                     selectedDates.splice(dateIndex, 1);
