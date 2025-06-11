@@ -305,8 +305,7 @@
             <button type="submit" id="submit-form" class="submit-btn disabled-btn" disabled>Invia Richiesta</button>
         </div>
     </form>
-    
-    <div id="form-result" class="form-result"></div>
+
 </div>
 
 <!-- CSS aggiuntivo -->
@@ -430,24 +429,6 @@
         font-weight: 500;
     }
     
-    .form-result {
-        margin-top: 20px;
-        padding: 15px;
-        border-radius: 4px;
-        display: none;
-    }
-    
-    .success-message {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-    
-    .error-message {
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
 </style>
 
 <!-- JavaScript per l'invio del form e gestione del calendario -->
@@ -605,12 +586,37 @@
             const mailtoLink = `mailto:merluzzialessia@gmail.com?subject=Richiesta Prenotazione Casa Vacanze&body=Nome e Cognome: ${encodeURIComponent(fullName)}%0D%0ANumero di ospiti: ${encodeURIComponent(guests)}%0D%0AAnimali domestici: ${encodeURIComponent(pets)}%0D%0APeriodo del soggiorno: ${encodeURIComponent(period)}%0D%0A%0D%0APREVENTIVO DETTAGLIATO:%0D%0A${preventivoDettagliato}%0D%0A%0D%0AAltro: ${encodeURIComponent(other)}`;
             
             // Apri il client di posta predefinito
-            window.location.href = mailtoLink;
-            
-            // Mostra il messaggio di successo
-            formResult.innerHTML = 'Grazie per la tua richiesta! Si aprirà il tuo client email per completare l\'invio.';
-            formResult.className = 'form-result success-message';
-            formResult.style.display = 'block';
+window.location.href = mailtoLink;
+
+// Reindirizza alla pagina di ringraziamento dopo un breve delay
+setTimeout(function() {
+    // Crea la pagina di ringraziamento e reindirizza
+    document.body.innerHTML = `
+        <div style="
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 40px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            background-color: #f5f5f5;
+        ">
+            <div style="
+                background-color: white;
+                padding: 40px;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            ">
+                <h1 style="color: #2c3e50; margin-bottom: 20px;">Richiesta Inviata</h1>
+                <p style="font-size: 18px; color: #2c3e50; line-height: 1.6;">
+                    Grazie per la tua richiesta! Si aprirà il tuo client email per completare l'invio.
+                </p>
+            </div>
+        </div>
+    `;
+}, 500);
         });
         
         // Aggiungi validazione per i campi numerici
