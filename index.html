@@ -297,9 +297,11 @@
             <textarea id="other" name="other" rows="4"></textarea>
         </div>
         
-        <div class="form-row">
-            <div class="form-hint warning">Non è possibile inviare la richiesta senza aver selezionato le date nel calendario principale. Se una data non è selezionabile attraverso il calendario principale significa che <strong> è già stata prenotata </strong> e, dunque, <strong> è impossibile prenotarla di nuovo</strong>.<p><strong>Ricorda</strong>: non si accettano prenotazioni di durata inferiore a 4 notti. Se il calcolatore non ha fornito un preventivo, vuol dire che il soggiorno selezionato è più breve di 4 notti e dunque non sarà accettato.</p></div>
-        </div>
+        <div class="form-hint warning">
+    <p><strong>IMPORTANTE:</strong> Prima di inviare la richiesta di prenotazione è <strong>OBBLIGATORIO calcolare il preventivo</strong> utilizzando il calcolatore nella parte superiore della pagina.</p>
+    <p>Non è possibile inviare la richiesta senza aver selezionato le date nel calendario principale e senza aver calcolato il preventivo con successo. Se una data non è selezionabile attraverso il calendario principale significa che <strong>è già stata prenotata</strong> e, dunque, <strong>è impossibile prenotarla di nuovo</strong>.</p>
+    <p><strong>Ricorda</strong>: non si accettano prenotazioni di durata inferiore a 4 notti. Se il calcolatore non ha fornito un preventivo, vuol dire che il soggiorno selezionato è più breve di 4 notti e dunque non sarà accettato.</p>
+</div>
         
         <div class="form-row">
             <button type="submit" id="submit-form" class="submit-btn disabled-btn" disabled>Invia Richiesta</button>
@@ -445,26 +447,35 @@
         const calendarSection = document.querySelector('.booking-section') || document.getElementById('calendar-section');
         
         // Funzione per verificare se è possibile inviare il form
-        function checkFormValidity() {
-            const fullName = document.getElementById('full-name').value.trim();
-            const guests = document.getElementById('guests').value;
-            const period = periodInput.value.trim();
-            
-            // Controlla se i campi obbligatori sono compilati
-            const isValid = fullName !== '' && guests !== '' && period !== '';
-            
-            // Abilita o disabilita il pulsante di invio
-            submitBtn.disabled = !isValid;
-            
-            // Aggiungi o rimuovi classe visuale per il pulsante disabilitato
-            if (isValid) {
-                submitBtn.classList.remove('disabled-btn');
-            } else {
-                submitBtn.classList.add('disabled-btn');
-            }
-            
-            return isValid;
-        }
+function checkFormValidity() {
+    const fullName = document.getElementById('full-name').value.trim();
+    const guests = document.getElementById('guests').value;
+    const period = periodInput.value.trim();
+    const resultElement = document.getElementById('result');
+    
+    // Controlla se i campi obbligatori sono compilati
+    const hasRequiredFields = fullName !== '' && guests !== '' && period !== '';
+    
+    // Controlla se il preventivo è stato calcolato CON SUCCESSO
+    const hasCalculatedQuote = resultElement && 
+                              resultElement.style.display !== 'none' && 
+                              resultElement.classList.contains('success');
+    
+    // Il form è valido solo se tutti i campi sono compilati E il preventivo è stato calcolato
+    const isValid = hasRequiredFields && hasCalculatedQuote;
+    
+    // Abilita o disabilita il pulsante di invio
+    submitBtn.disabled = !isValid;
+    
+    // Aggiungi o rimuovi classe visuale per il pulsante disabilitato
+    if (isValid) {
+        submitBtn.classList.remove('disabled-btn');
+    } else {
+        submitBtn.classList.add('disabled-btn');
+    }
+    
+    return isValid;
+}
         
         // Esegui il controllo iniziale della validità
         checkFormValidity();
@@ -510,20 +521,40 @@
             e.preventDefault();
             
             // Verifica nuovamente la validità prima di procedere
-            if (!checkFormValidity()) {
-                formResult.innerHTML = 'Per favore, compila tutti i campi obbligatori.';
-                formResult.className = 'form-result error-message';
-                formResult.style.display = 'block';
-                
-                // Evidenzia specificamente se il periodo non è selezionato
-                if (!periodInput.value.trim()) {
-                    alert('È necessario selezionare un periodo di soggiorno utilizzando il calendario principale.');
-                    if (calendarSection) {
-                        calendarSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                }
-                return;
-            }
+if (!checkFormValidity()) {
+    const hasRequiredFields = document.getElementById('full-name').value.trim() !== '' && 
+                             document.getElementById('guests').value !== '' && 
+                             periodInput.value.trim() !== '';
+    
+    const resultElement = document.getElementById('result');
+    const hasCalculatedQuote = resultElement && 
+                              resultElement.style.display !== 'none' && 
+                              resultElement.classList.contains('success');
+    
+    let errorMessage = '';
+    
+    if (!hasRequiredFields) {
+        errorMessage = 'Per favore, compila tutti i campi obbligatori.';
+        
+        // Evidenzia specificamente se il periodo non è selezionato
+        if (!periodInput.value.trim()) {
+            errorMessage += ' È necessario selezionare un periodo di soggiorno utilizzando il calendario principale.';
+        }
+    } else if (!hasCalculatedQuote) {
+        errorMessage = 'È OBBLIGATORIO calcolare il preventivo prima di inviare la richiesta di prenotazione. Utilizza il calcolatore nella parte superiore della pagina e clicca "Calcola Preventivo".';
+    }
+    
+    formResult.innerHTML = errorMessage;
+    formResult.className = 'form-result error-message';
+    formResult.style.display = 'block';
+    
+    // Se non è stato calcolato il preventivo, scorri verso il calcolatore
+    if (!hasCalculatedQuote && calendarSection) {
+        calendarSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    return;
+}
             
             // Raccogli i dati dal form
             const fullName = document.getElementById('full-name').value;
@@ -653,6 +684,26 @@ setTimeout(function() {
                     } else {
                         periodInput.value = '';
                     }
+
+// Observer per monitorare quando viene calcolato il preventivo
+const resultElement = document.getElementById('result');
+if (resultElement) {
+    const resultObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            // Controlla la validità del form ogni volta che cambia il risultato del preventivo
+            checkFormValidity();
+        });
+    });
+    
+    // Monitora i cambiamenti nel div del risultato
+    resultObserver.observe(resultElement, { 
+        childList: true, 
+        characterData: true, 
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    });
+}
                     
                     // Controlla la validità del form dopo ogni modifica
                     checkFormValidity();
