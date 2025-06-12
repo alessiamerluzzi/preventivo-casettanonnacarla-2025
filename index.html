@@ -619,8 +619,29 @@ if (!checkFormValidity()) {
             // Apri il client di posta predefinito
 window.location.href = mailtoLink;
 
+            // Verifica se ci sono animali domestici
+const hasPets = parseInt(pets) > 0;
+
 // Reindirizza alla pagina di ringraziamento dopo un breve delay
 setTimeout(function() {
+    // Determina il messaggio aggiuntivo per chi ha animali domestici
+    const additionalMessage = hasPets ? `
+        <div style="
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 20px;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+            margin-top: 20px;
+            text-align: left;
+        ">
+            <h3 style="margin-top: 0; color: #856404;">Hai animali domestici?</h3>
+            <p style="margin-bottom: 0; line-height: 1.6;">
+                <small>Ricordati di leggere le regole per il loro accesso alla spiaggia. Le regole rimangono le stesse ogni anno ma vengono comunque ripubblicate di giugno in giugno. Clicca <a href="https://www.comune.follonica.gr.it/Novita/Notizie/Accesso-dei-cani-sulla-spiaggia-cosa-fare" target="_blank">qui</a> per leggere le ultime direttive pubblicate.</small>
+            </p>
+        </div>
+    ` : '';
+
     // Crea la pagina di ringraziamento e reindirizza
     document.body.innerHTML = `
         <div style="
@@ -640,10 +661,11 @@ setTimeout(function() {
                 border-radius: 10px;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             ">
-                <h1 style="color: #2c3e50; margin-bottom: 20px;">Richiesta Inviata</h1>
+                <h1 style="color: #2c3e50; margin-bottom: 20px;">Stai inviando la tua richiesta!</h1>
                 <p style="font-size: 18px; color: #2c3e50; line-height: 1.6;">
-                    Grazie per la tua richiesta! Si aprirà il tuo client email per completare l'invio.
+                    Grazie di aver scelto la nostra casetta! Si aprirà il tuo client email per completare l'invio.
                 </p>
+                ${additionalMessage}
             </div>
         </div>
     `;
