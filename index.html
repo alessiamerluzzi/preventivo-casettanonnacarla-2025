@@ -122,6 +122,17 @@
             color: #ccc;
             cursor: not-allowed;
         }
+      
+      .calendar-day.offseason {
+    background-color: #eef3f7; /* simile al prenotabile, ma più spento */
+    color: #666;
+    cursor: pointer;
+}
+.calendar-day.offseason:hover {
+    background-color: #d9e6f0;
+}
+
+      
         .calendar-day .price {
             font-size: 10px;
             position: absolute;
@@ -199,14 +210,21 @@
         
         <div class="form-row">
             <label for="month-select">Seleziona mese:</label>
-            <select id="month-select">
-                <option value="4">Maggio 2025</option>
-                <option value="5">Giugno 2025</option>
-                <option value="6">Luglio 2025</option>
-                <option value="7">Agosto 2025</option>
-                <option value="8">Settembre 2025</option>
-                <option value="9">Ottobre 2025</option>
-            </select>
+           <select id="month-select">
+    <option value="4-2025">Maggio 2025</option>
+    <option value="5-2025">Giugno 2025</option>
+    <option value="6-2025">Luglio 2025</option>
+    <option value="7-2025">Agosto 2025</option>
+    <option value="8-2025">Settembre 2025</option>
+    <option value="9-2025">Ottobre 2025</option>
+    <option value="10-2025">Novembre 2025</option>
+    <option value="11-2025">Dicembre 2025</option>
+    <option value="0-2026">Gennaio 2026</option>
+    <option value="1-2026">Febbraio 2026</option>
+    <option value="2-2026">Marzo 2026</option>
+    <option value="3-2026">Aprile 2026</option>
+</select>
+
         </div>
 
         <div id="calendar-container">
@@ -859,69 +877,83 @@ if (resultElement) {
             }
             
             // Funzione per aggiornare il calendario
-            function updateCalendar() {
-                // Rimuovi tutti i giorni esistenti
-                const dayElements = document.querySelectorAll('.calendar-day');
-                dayElements.forEach(el => el.remove());
-                
-                // Ottieni il mese selezionato
-                const selectedMonth = parseInt(monthSelect.value);
-                const year = 2025;
-                
-                // Crea la data del primo giorno del mese
-                const firstDay = new Date(year, selectedMonth, 1);
-                
-                // Trova il primo giorno della settimana (0 = Domenica, 1 = Lunedì, ecc.)
-                let dayOfWeek = firstDay.getDay() || 7; // Converte 0 (domenica) a 7
-                dayOfWeek = dayOfWeek - 1; // Adatta a lunedì = 0
-                
-                // Aggiungi celle vuote per i giorni prima del primo del mese
-                for (let i = 0; i < dayOfWeek; i++) {
-                    const emptyCell = document.createElement('div');
-                    emptyCell.className = 'calendar-day empty';
-                    emptyCell.style.visibility = 'hidden'; // mantiene lo spazio ma non mostra nulla
-                    calendarElement.appendChild(emptyCell);
-                }
-                
-                // Calcola il numero di giorni nel mese
-                const lastDay = new Date(year, selectedMonth + 1, 0);
-                const daysInMonth = lastDay.getDate();
-                
-                // Aggiungi tutti i giorni del mese
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const date = new Date(year, selectedMonth, day);
-                    const dayElement = document.createElement('div');
-                    dayElement.className = 'calendar-day';
-                    dayElement.textContent = day;
-                    
-                    // Verifica se la data è prenotabile
-                    const isBookable = isBookableDate(date);
-                    
-                    // Aggiungi il prezzo se disponibile e prenotabile
-                    const price = getDatePrice(date);
-                    if (price && isBookable) {
-                        const priceElement = document.createElement('span');
-                        priceElement.className = 'price';
-                        priceElement.textContent = `${price}€`;
-                        dayElement.appendChild(priceElement);
-                    } else {
-                        dayElement.classList.add('disabled');
-                        dayElement.title = 'Data non prenotabile';
-                    }
-                    
-                    // Verifica se la data è selezionata
-                    if (isDateSelected(date)) {
-                        dayElement.classList.add('selected');
-                    }
-                    
-                    // Aggiungi l'evento click solo se la data è prenotabile
-                    if (price && isBookable) {
-                        dayElement.addEventListener('click', () => toggleDateSelection(date));
-                    }
-                    
-                    calendarElement.appendChild(dayElement);
-                }
-            }
+function updateCalendar() {
+    // Rimuovi tutti i giorni esistenti
+    const dayElements = document.querySelectorAll('.calendar-day');
+    dayElements.forEach(el => el.remove());
+
+    // Ottieni mese e anno dal select (formato "mese-anno")
+    let parts = monthSelect.value.split('-');
+    let selectedMonth = parseInt(parts[0], 10);
+    let year = parseInt(parts[1], 10);
+
+    if (isNaN(selectedMonth) || isNaN(year)) {
+        console.error("Errore: valore del select non valido:", monthSelect.value);
+        return;
+    }
+
+    // Crea la data del primo giorno del mese
+    const firstDay = new Date(year, selectedMonth, 1);
+
+    // Trova il primo giorno della settimana (0 = Domenica, 1 = Lunedì, ecc.)
+    let dayOfWeek = firstDay.getDay() || 7; // Converte 0 (domenica) a 7
+    dayOfWeek = dayOfWeek - 1; // Adatta a lunedì = 0
+
+    // Aggiungi celle vuote prima del primo giorno del mese
+    for (let i = 0; i < dayOfWeek; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'calendar-day empty';
+        emptyCell.style.visibility = 'hidden';
+        calendarElement.appendChild(emptyCell);
+    }
+
+    // Calcola il numero di giorni nel mese
+    const lastDay = new Date(year, selectedMonth + 1, 0);
+    const daysInMonth = lastDay.getDate();
+
+    // Definisci periodo off-season (1 nov 2025 – 30 apr 2026)
+    const offSeasonStart = new Date(2025, 10, 1); // 1 nov 2025
+    const offSeasonEnd = new Date(2026, 3, 30);   // 30 apr 2026
+
+    // Aggiungi tutti i giorni del mese
+    for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, selectedMonth, day);
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        dayElement.textContent = day;
+
+        // Verifica se la data è prenotabile
+        const isBookable = isBookableDate(date);
+        const price = getDatePrice(date);
+
+        if (price && isBookable) {
+            // Normale: prenotabile
+            const priceElement = document.createElement('span');
+            priceElement.className = 'price';
+            priceElement.textContent = `${price}€`;
+            dayElement.appendChild(priceElement);
+            dayElement.addEventListener('click', () => toggleDateSelection(date));
+        } else if (date >= offSeasonStart && date <= offSeasonEnd) {
+            // Fuori stagione: cliccabile ma con popup
+            dayElement.classList.add('offseason');
+            dayElement.addEventListener('click', () => {
+                alert("La struttura accetta prenotazioni solo nel periodo fra maggio e ottobre: essendo una casa sulla spiaggia, non possiamo garantire un soggiorno di qualità nel resto dell'anno");
+            });
+        } else {
+            // Realmente non prenotabile
+            dayElement.classList.add('disabled');
+            dayElement.title = 'Data non prenotabile';
+        }
+
+        // Evidenzia se la data è selezionata
+        if (isDateSelected(date)) {
+            dayElement.classList.add('selected');
+        }
+
+        calendarElement.appendChild(dayElement);
+    }
+}
+
             
             // Funzione per verificare se una data è selezionata
             function isDateSelected(date) {
