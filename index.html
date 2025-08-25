@@ -10,12 +10,83 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #97b0c2;
         }
         h1, h2 {
-            color: #2c3e50;
+            color: #ffffff;
             text-align: center;
         }
+      
+      /* Stili per il banner con foto */
+.banner-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    margin-bottom: 30px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.7);
+    transition: filter 0.3s ease;
+}
+
+.banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(52, 152, 219, 0.15), rgba(41, 128, 185, 0.2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-text {
+    color: white !important;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.banner-text h1 {
+    font-size: 2.5em;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.banner-text p {
+    font-size: 1.2em;
+    margin: 10px 0 0 0;
+    opacity: 0.9;
+}
+
+.banner-container:hover .banner-image {
+    filter: brightness(0.8);
+}
+
+/* Responsive per il banner */
+@media (max-width: 768px) {
+    .banner-container {
+        height: 200px;
+    }
+    
+    .banner-text h1 {
+        font-size: 2em;
+    }
+    
+    .banner-text p {
+        font-size: 1em;
+    }
+}
+      
+      
         h1 {
             margin-bottom: 30px;
         }
@@ -24,11 +95,13 @@
             margin: 25px 0 15px 0;
         }
         .container {
-            background-color: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
         label {
             display: block;
             margin-bottom: 8px;
@@ -203,10 +276,19 @@
 </head>
 <body>
     <div class="container">
-        <h1>Preventivo "Casetta Nonna Carla"</h1>
-        <p align="center">
-  <small>Per ulteriori info visita il <a href="https://sites.google.com/view/casettanonnacarla?usp=sharing" target="_blank">nostro sito.</a></small>
-</p>
+    <div class="banner-container">
+        <img src="https://lh5.googleusercontent.com/f8cpqubUzowwgk5s1DuRuCh8LifTgPX6g5Qvwvs0IONMxa55Mo0ZuEDsFpSQZ-Kzlk0kVyrfZXS8w22yNTLjXkf1nYhrO-35vxxXcV_FMzZWLOa3e6Y226nLc4NBa0JvySQMmetMX1VKEfHMkvQrxMFH9JHPU1AIJy7VGCsqC3XIds-PyVG--g=w1280" alt="Casetta Nonna Carla" class="banner-image">
+        <div class="banner-overlay">
+            <div class="banner-text">
+                <h1>Preventivo "Casetta Nonna Carla"</h1>
+                <p>La tua casa vacanze sul mare</p>
+            </div>
+        </div>
+    </div>
+    
+    <p align="center">
+        <small>Per ulteriori info visita il <a href="https://sites.google.com/view/casettanonnacarla?usp=sharing" target="_blank">nostro sito.</a></small>
+    </p>
         
         <div class="form-row">
             <label for="month-select">Seleziona mese:</label>
@@ -280,8 +362,6 @@
 <p>Il prezzo non include la <strong>tassa di soggiorno</strong>, che deve essere pagata in loco al momento dell'arrivo. Nelle date comprese fra 1 aprile e 15 giugno e poi nelle date comprese fra 16 settembre e 30 settembre la tassa di soggiorno è di 0,50€. Nelle date comprese fra il 16 giugno e il 15 settembre la tassa di soggiorno è di 1€. La tassa di soggiorno deve essere pagata solo dalle persone che hanno compiuto 16 anni. <strong> <a href="https://alessiamerluzzi.github.io/tassasoggiorno-follonica/" target="_blank">Calcola la tassa di soggiorno </a></strong></p>
 </div>
  
-      
-
 <!-- Modifica sezione contatti -->
 <h2>Contatti</h2>
 <div class="contact-section">
@@ -322,10 +402,8 @@
         </div>
         
         <div class="form-hint warning">
-    <p><strong>IMPORTANTE:</strong> Prima di inviare la richiesta di prenotazione è <strong>OBBLIGATORIO calcolare il preventivo</strong> utilizzando il calcolatore nella parte superiore della pagina.</p>
-    <p>Non è possibile inviare la richiesta senza aver selezionato le date nel calendario principale e senza aver calcolato il preventivo con successo. Se una data non è selezionabile attraverso il calendario principale significa che <strong>è già stata prenotata</strong> e, dunque, <strong>è impossibile prenotarla di nuovo</strong>.</p>
-    <p><strong>Ricorda</strong>: non si accettano prenotazioni di durata inferiore a 4 notti. Se il calcolatore non ha fornito un preventivo, vuol dire che il soggiorno selezionato è più breve di 4 notti e dunque non sarà accettato.</p>
-</div>
+    <p><strong>IMPORTANTE:</strong> Non è possibile inviare la richiesta senza aver selezionato le date nel calendario principale e senza aver calcolato il preventivo con successo. Se una data non è selezionabile attraverso il calendario principale significa che <strong>è già stata prenotata</strong> e, dunque, <strong>è impossibile prenotarla di nuovo</strong>.</p>
+    
         
         <div class="form-row">
             <button type="submit" id="submit-form" class="submit-btn disabled-btn" disabled>Invia Richiesta</button>
@@ -1049,7 +1127,7 @@ const pricesNotAvailableEnd = new Date(2026, 9, 31);   // 31 ottobre 2026
    dayElement.addEventListener('click', () => {
     showCustomPopup(
         'Prezzi non ancora disponibili',
-        '<p>I prezzi per questo periodo <strong>non sono ancora disponibili</strong>. Per un\'idea <strong>assolutamente indicativa</strong> è possibile consultare i periodi corrispondenti nell\'anno precedente, tenendo però presente che <strong> gli importi saranno sicuramente diversi </strong> per la stagione 2026 a fronte di alcune migliorie.</p><p>Le informazioni verranno aggiornate fra <strong>dicembre 2025 e gennaio 2026</strong>: iscriviti alla nostra newsletter <a href="https://casettanonnacarla.substack.com/p/coming-soon?r=6d8m0d&utm_campaign=post&utm_medium=web&triedRedirect=true" target="_blank">per conoscere tutte le novità in anteprima</a>.</p>'
+        '<p>I prezzi per questo periodo <strong>non sono ancora disponibili</strong>. Per permettervi di avere un\'idea <strong>assolutamente indicativa</strong> è possibile consultare i periodi corrispondenti nell\'anno precedente, tenendo però presente che <strong> gli importi saranno sicuramente diversi </strong> per la stagione 2026 a fronte di alcune migliorie che stiamo programmando.</p><p>Le informazioni verranno aggiornate fra <strong>dicembre 2025 e gennaio 2026</strong>: iscriviti alla nostra newsletter <a href="https://casettanonnacarla.substack.com/p/coming-soon?r=6d8m0d&utm_campaign=post&utm_medium=web&triedRedirect=true" target="_blank">per conoscere tutte le novità in anteprima</a>.</p>'
     );
 });
   
@@ -1271,10 +1349,46 @@ const pricesNotAvailableEnd = new Date(2026, 9, 31);   // 31 ottobre 2026
                 resultElement.style.display = 'block';
                 resultElement.innerHTML = html;
             }
-            
+            // Imposta automaticamente il mese corrente
+            setCurrentMonth();
             // Inizializza il calendario
             updateCalendar();
             
+          // Funzione per impostare automaticamente il mese corrente
+function setCurrentMonth() {
+    const today = new Date();
+    const currentMonth = today.getMonth(); // 0 = gennaio, 1 = febbraio, ecc.
+    const currentYear = today.getFullYear();
+    
+    // Crea il valore nel formato utilizzato dal select (mese-anno)
+    const currentValue = `${currentMonth}-${currentYear}`;
+    
+    // Verifica se questo valore esiste nelle opzioni del select
+    const options = monthSelect.querySelectorAll('option');
+    let foundCurrentMonth = false;
+    
+    for (let option of options) {
+        if (option.value === currentValue) {
+            monthSelect.value = currentValue;
+            foundCurrentMonth = true;
+            break;
+        }
+    }
+    
+    // Se il mese corrente non è disponibile, cerca il primo mese futuro disponibile
+    if (!foundCurrentMonth) {
+        for (let option of options) {
+            const [optionMonth, optionYear] = option.value.split('-').map(Number);
+            const optionDate = new Date(optionYear, optionMonth, 1);
+            const todayDate = new Date(currentYear, currentMonth, 1);
+            
+            if (optionDate >= todayDate) {
+                monthSelect.value = option.value;
+                break;
+            }
+        }
+    }
+}
             // Aggiungi event listeners
             monthSelect.addEventListener('change', updateCalendar);
             calculateButton.addEventListener('click', calculateQuote);
